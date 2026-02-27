@@ -1,43 +1,42 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Amaris.Application.DTOs.Turn;
+using Amaris.Application.Interfaces;
 
 namespace Amaris.Api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
     public class TurnController : ControllerBase
     {
-        // GET: api/<TurnController>
+        private readonly ITurnService _turnoService;
+
+        public TurnController(ITurnService turnoService) => _turnoService = turnoService;
+
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> GetAll() => Ok(await _turnoService.ObtenerTodosAsync());
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            return new string[] { "value1", "value2" };
+            var turno = await _turnoService.ObtenerPorIdAsync(id);
+            return turno is null ? NotFound() : Ok(turno);
         }
 
-        // GET api/<TurnController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<TurnController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Create([FromBody] CreateTurnDto dto)
         {
+            var turno = await _turnoService.CrearTurnoAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = turno.Id }, turno);
         }
 
-        // PUT api/<TurnController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+        [HttpPut("{id:int}/activar")]
+        public async Task<IActionResult> Activar(int id) =>
+            Ok(await _turnoService.ActivarTurnoAsync(id));
 
-        // DELETE api/<TurnController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        [HttpPut("estado")]
+        public async Task<IActionResult> ActualizarEstado([FromBody] UpdateTurnDto dto) =>
+            Ok(await _turnoService.ActualizarEstadoAsync(dto));
     }
 }

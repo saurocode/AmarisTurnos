@@ -24,9 +24,4 @@
     <ProjectReference Include="..\Amaris.Infrastructure\Amaris.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Middleware\" />
-    <Folder Include="Extensions\" />
-  </ItemGroup>
-
 </Project>

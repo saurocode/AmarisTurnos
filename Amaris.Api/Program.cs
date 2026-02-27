@@ -1,25 +1,38 @@
+using Amaris.Api.Extensions;
+using Amaris.Api.Middleware;
+using Microsoft.EntityFrameworkCore;
+using Amaris.Infrastructure.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services
+    .AddDatabase(builder.Configuration)
+    .AddRepositories()
+    .AddApplicationServices()
+    .AddJwtAuthentication(builder.Configuration)
+    .AddSwaggerWithJwt();
+
+builder.Services.AddCors(options =>
+    options.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
 }
 
-app.UseHttpsRedirection();
-
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseCors("AllowAll");
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
