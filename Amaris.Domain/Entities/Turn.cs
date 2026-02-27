@@ -13,5 +13,7 @@ namespace Amaris.Domain.Entities
         public DateTime? DateActivation { get; set; }
         public StatusTurn Status { get; set; } = StatusTurn.Pendiente;
         public string TurnCode { get; set; } = string.Empty;
+        public int ServiceId { get; set; }
+        public Service Service { get; set; } = null!;
     }
 }

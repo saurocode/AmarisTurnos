@@ -10,13 +10,15 @@ namespace Amaris.Application.Services
     {
         private readonly ITurnRepository _turnoRepository;
         private readonly ILocationRepository _sucursalRepository;
+        private readonly IServiceRepository _serviceRepository;
         private const int LimiteTurnosDiarios = 5;
         private const int MinutosLimite = 15;
 
-        public TurnService(ITurnRepository turnoRepository, ILocationRepository sucursalRepository)
+        public TurnService(ITurnRepository turnoRepository, ILocationRepository sucursalRepository, IServiceRepository serviceRepository)
         {
             _turnoRepository = turnoRepository;
             _sucursalRepository = sucursalRepository;
+            _serviceRepository = serviceRepository;
         }
 
 
@@ -29,11 +31,15 @@ namespace Amaris.Application.Services
             var sucursal = await _sucursalRepository.GetByIdAsync(dto.IdLocation)
                 ?? throw new KeyNotFoundException($"La sucursal con Id {dto.IdLocation} no existe.");
 
+            var service = await _serviceRepository.GetByIdAsync(dto.ServiceId)
+                 ?? throw new KeyNotFoundException($"El servicio con Id {dto.ServiceId} no existe.");
+
             var ahora = DateTime.UtcNow;
             var turno = new Turn
             {
                 Identification = dto.Identification,
                 IdLocation = dto.IdLocation,
+                ServiceId = dto.ServiceId,
                 DateCreation = ahora,
                 DateExpiration = ahora.AddMinutes(MinutosLimite),
                 Status = StatusTurn.Pendiente,
@@ -123,7 +129,9 @@ namespace Amaris.Application.Services
                 DateExpiration = turno.DateExpiration,
                 DateActivation = turno.DateActivation,
                 Status = turno.Status.ToString(),
-                MinutesRemaining = minutosRestantes
+                MinutesRemaining = minutosRestantes,
+                ServiceId = turno.ServiceId,
+                ServiceName = turno.Service?.Name ?? ""
             };
         }
 

@@ -28,6 +28,7 @@ namespace Amaris.Api.Extensions
             services.AddScoped<ITurnRepository, TurnRepository>();
             services.AddScoped<ILocationRepository, LocationRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IServiceRepository, ServiceRepository>();
             return services;
         }
 

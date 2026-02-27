@@ -18,5 +18,7 @@ namespace Amaris.Application.DTOs.Turn
         public DateTime? DateActivation { get; set; }
         public string Status { get; set; } = string.Empty;
         public int MinutesRemaining { get; set; }
+        public int ServiceId { get; set; }
+        public string ServiceName { get; set; } = string.Empty;
     }
 }

@@ -20,10 +20,16 @@ namespace Amaris.Infrastructure.Repositories
         }
 
         public async Task<Turn?> GetByIdAsync(int id) =>
-            await _context.Turn.Include(t => t.Location).FirstOrDefaultAsync(t => t.Id == id);
+            await _context.Turn
+            .Include(t => t.Location)
+            .Include(t => t.Service)
+            .FirstOrDefaultAsync(t => t.Id == id);
 
         public async Task<IEnumerable<Turn>> GetAllAsync() =>
-            await _context.Turn.Include(t => t.Location).OrderByDescending(t => t.DateCreation).ToListAsync();
+            await _context.Turn
+            .Include(t => t.Location)
+            .Include(t => t.Service)
+            .OrderByDescending(t => t.DateCreation).ToListAsync();
 
         public async Task<IEnumerable<Turn>> GetByCedulaAsync(string cedula) =>
             await _context.Turn.Include(t => t.Location)
@@ -41,6 +47,10 @@ namespace Amaris.Infrastructure.Repositories
         {
             _context.Turn.Add(Turn);
             await _context.SaveChangesAsync();
+
+            await _context.Entry(Turn).Reference(t => t.Location).LoadAsync();
+            await _context.Entry(Turn).Reference(t => t.Service).LoadAsync();
+
             return Turn;
         }
 
