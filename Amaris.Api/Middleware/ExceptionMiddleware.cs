@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using Amaris.Application.Common;
+using FluentValidation;
+using System.Net;
 using System.Text.Json;
 
 namespace Amaris.Api.Middleware
@@ -31,6 +33,8 @@ namespace Amaris.Api.Middleware
         {
             var (statusCode, message) = exception switch
             {
+                ValidationException ve => (HttpStatusCode.BadRequest,
+                    string.Join(" | ", ve.Errors.Select(e => e.ErrorMessage))),
                 KeyNotFoundException => (HttpStatusCode.NotFound, exception.Message),
                 InvalidOperationException => (HttpStatusCode.BadRequest, exception.Message),
                 UnauthorizedAccessException => (HttpStatusCode.Unauthorized, exception.Message),
@@ -40,7 +44,13 @@ namespace Amaris.Api.Middleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)statusCode;
 
-            var result = JsonSerializer.Serialize(new { error = message, statusCode = (int)statusCode });
+            var response = ApiResponse<object>.Fail(message, (int)statusCode);
+            var result = JsonSerializer.Serialize(response, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            });
+
             return context.Response.WriteAsync(result);
         }
     }
