@@ -14,5 +14,5 @@ public class LocationController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAll() =>
-        Ok(await _sucursalRepository.GetAllActivasAsync());
+        Ok(await _sucursalRepository.GetAllActiveAsync());
 }

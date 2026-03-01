@@ -8,25 +8,25 @@ namespace Amaris.Application.Services
 {
     public class TurnService : ITurnService
     {
-        private readonly ITurnRepository _turnoRepository;
+        private readonly ITurnRepository _turnRepository;
         private readonly ILocationRepository _sucursalRepository;
         private readonly IServiceRepository _serviceRepository;
-        private const int LimiteTurnosDiarios = 5;
-        private const int MinutosLimite = 15;
+        private const int DailyTurnLimit = 5;
+        private const int MinutesLimit = 15;
 
         public TurnService(ITurnRepository turnoRepository, ILocationRepository sucursalRepository, IServiceRepository serviceRepository)
         {
-            _turnoRepository = turnoRepository;
+            _turnRepository = turnoRepository;
             _sucursalRepository = sucursalRepository;
             _serviceRepository = serviceRepository;
         }
 
 
-        public async Task<TurnResponseDto> CrearTurnoAsync(CreateTurnDto dto)
+        public async Task<TurnResponseDto> CreateTurnAsync(CreateTurnDto dto)
         {
-            var turnosHoy = await _turnoRepository.CountTurnosHoyByCedulaAsync(dto.Identification);
-            if (turnosHoy >= LimiteTurnosDiarios)
-                throw new InvalidOperationException($"La cédula {dto.Identification} ya alcanzó el límite de {LimiteTurnosDiarios} turnos por día.");
+            var turnosHoy = await _turnRepository.CountTurnTodayByCedulaAsync(dto.Identification);
+            if (turnosHoy >= DailyTurnLimit)
+                throw new InvalidOperationException($"La cédula {dto.Identification} ya alcanzó el límite de {DailyTurnLimit} turnos por día.");
 
             var sucursal = await _sucursalRepository.GetByIdAsync(dto.IdLocation)
                 ?? throw new KeyNotFoundException($"La sucursal con Id {dto.IdLocation} no existe.");
@@ -41,30 +41,30 @@ namespace Amaris.Application.Services
                 IdLocation = dto.IdLocation,
                 ServiceId = dto.ServiceId,
                 DateCreation = ahora,
-                DateExpiration = ahora.AddMinutes(MinutosLimite),
+                DateExpiration = ahora.AddMinutes(MinutesLimit),
                 Status = StatusTurn.Pendiente,
-                TurnCode = GenerarCodigo()
+                TurnCode = GenerateCode()
             };
 
-            var creado = await _turnoRepository.CreateAsync(turno);
+            var creado = await _turnRepository.CreateAsync(turno);
             return MapToDto(creado, sucursal.Name);
         }
 
-        public async Task<IEnumerable<TurnResponseDto>> ObtenerTodosAsync()
+        public async Task<IEnumerable<TurnResponseDto>> GetAllAsync()
         {
-            var turnos = await _turnoRepository.GetAllAsync();
+            var turnos = await _turnRepository.GetAllAsync();
             return turnos.Select(t => MapToDto(t, t.Location?.Name ?? ""));
         }
 
-        public async Task<TurnResponseDto?> ObtenerPorIdAsync(int id)
+        public async Task<TurnResponseDto?> GetByIdAsync(int id)
         {
-            var turno = await _turnoRepository.GetByIdAsync(id);
+            var turno = await _turnRepository.GetByIdAsync(id);
             return turno is null ? null : MapToDto(turno, turno.Location?.Name ?? "");
         }
 
-        public async Task<TurnResponseDto> ActivarTurnoAsync(int id)
+        public async Task<TurnResponseDto> ActivateTurnAsync(int id)
         {
-            var turno = await _turnoRepository.GetByIdAsync(id)
+            var turno = await _turnRepository.GetByIdAsync(id)
                 ?? throw new KeyNotFoundException($"Turno {id} no encontrado.");
 
             if (turno.Status == StatusTurn.Expirado)
@@ -76,43 +76,43 @@ namespace Amaris.Application.Services
             if (DateTime.UtcNow > turno.DateExpiration)
             {
                 turno.Status = StatusTurn.Expirado;
-                await _turnoRepository.UpdateAsync(turno);
+                await _turnRepository.UpdateAsync(turno);
                 throw new InvalidOperationException("El turno expiró. Por favor genere uno nuevo.");
             }
 
             turno.Status = StatusTurn.Activo;
             turno.DateActivation = DateTime.UtcNow;
-            var actualizado = await _turnoRepository.UpdateAsync(turno);
+            var actualizado = await _turnRepository.UpdateAsync(turno);
             return MapToDto(actualizado, actualizado.Location?.Name ?? "");
         }
 
-        public async Task<TurnResponseDto> ActualizarEstadoAsync(UpdateTurnDto dto)
+        public async Task<TurnResponseDto> UpdateStatusAsync(UpdateTurnDto dto)
         {
-            var turno = await _turnoRepository.GetByIdAsync(dto.Id)
+            var turno = await _turnRepository.GetByIdAsync(dto.Id)
                 ?? throw new KeyNotFoundException($"Turno {dto.Id} no encontrado.");
 
             if (!Enum.TryParse<StatusTurn>(dto.NewStatus, true, out var nuevoStatus))
                 throw new ArgumentException($"Status '{dto.NewStatus}' no válido.");
 
             turno.Status = nuevoStatus;
-            var actualizado = await _turnoRepository.UpdateAsync(turno);
+            var actualizado = await _turnRepository.UpdateAsync(turno);
             return MapToDto(actualizado, actualizado.Location?.Name ?? "");
         }
 
-        public async Task ProcesarTurnosExpiradosAsync()
+        public async Task ProcessExpiredTurnAsync()
         {
-            var expirados = await _turnoRepository.GetTurnosExpiradosAsync();
+            var expirados = await _turnRepository.GetExpiredTurnAsync();
             foreach (var turno in expirados)
             {
                 turno.Status = StatusTurn.Expirado;
-                await _turnoRepository.UpdateAsync(turno);
+                await _turnRepository.UpdateAsync(turno);
             }
         }
 
-        private static string GenerarCodigo() =>
+        private static string GenerateCode() =>
             $"T-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6].ToUpper()}";
 
-        private static TurnResponseDto MapToDto(Turn turno, string nombreSucursal)
+        private static TurnResponseDto MapToDto(Turn turno, string nombreSucursal, string serviceName = "")
         {
             var minutosRestantes = turno.Status == StatusTurn.Pendiente
                 ? Math.Max(0, (int)(turno.DateExpiration - DateTime.UtcNow).TotalMinutes)
@@ -133,6 +133,12 @@ namespace Amaris.Application.Services
                 ServiceId = turno.ServiceId,
                 ServiceName = turno.Service?.Name ?? ""
             };
+        }
+
+        public async Task<IEnumerable<TurnResponseDto>> GetByIdentificationAsync(string identification)
+        {
+            var turns = await _turnRepository.GetByIdentificationAsync(identification);
+            return turns.Select(t => MapToDto(t, t.Location?.Name ?? "", t.Service?.Name ?? ""));
         }
 
     }

@@ -36,7 +36,7 @@ namespace Amaris.Infrastructure.Repositories
                 .Where(t => t.Identification == cedula)
                 .OrderByDescending(t => t.DateCreation).ToListAsync();
 
-        public async Task<int> CountTurnosHoyByCedulaAsync(string cedula)
+        public async Task<int> CountTurnTodayByCedulaAsync(string cedula)
         {
             var hoy = DateTime.UtcNow.Date;
             return await _context.Turn
@@ -61,7 +61,15 @@ namespace Amaris.Infrastructure.Repositories
             return Turn;
         }
 
-        public async Task<IEnumerable<Turn>> GetTurnosExpiradosAsync() =>
+        public async Task<IEnumerable<Turn>> GetByIdentificationAsync(string identification) =>
+            await _context.Turn
+                .Include(t => t.Location)
+                .Include(t => t.Service)
+                .Where(t => t.Identification == identification)
+                .OrderByDescending(t => t.DateCreation)
+                .ToListAsync();
+
+        public async Task<IEnumerable<Turn>> GetExpiredTurnAsync() =>
             await _context.Turn
                 .Where(t => t.Status == StatusTurn.Pendiente && t.DateExpiration < DateTime.UtcNow)
                 .ToListAsync();

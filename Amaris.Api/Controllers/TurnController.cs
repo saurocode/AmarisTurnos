@@ -10,33 +10,33 @@ namespace Amaris.Api.Controllers
     [Authorize]
     public class TurnController : ControllerBase
     {
-        private readonly ITurnService _turnoService;
+        private readonly ITurnService _turnService;
 
-        public TurnController(ITurnService turnoService) => _turnoService = turnoService;
+        public TurnController(ITurnService turnoService) => _turnService = turnoService;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll() => Ok(await _turnoService.ObtenerTodosAsync());
+        public async Task<IActionResult> GetAll() => Ok(await _turnService.GetAllAsync());
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var turno = await _turnoService.ObtenerPorIdAsync(id);
+            var turno = await _turnService.GetByIdAsync(id);
             return turno is null ? NotFound() : Ok(turno);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateTurnDto dto)
         {
-            var turno = await _turnoService.CrearTurnoAsync(dto);
+            var turno = await _turnService.CreateTurnAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = turno.Id }, turno);
         }
 
         [HttpPut("{id:int}/activar")]
         public async Task<IActionResult> Activar(int id) =>
-            Ok(await _turnoService.ActivarTurnoAsync(id));
+            Ok(await _turnService.ActivateTurnAsync(id));
 
         [HttpPut("estado")]
         public async Task<IActionResult> ActualizarEstado([FromBody] UpdateTurnDto dto) =>
-            Ok(await _turnoService.ActualizarEstadoAsync(dto));
+            Ok(await _turnService.UpdateStatusAsync(dto));
     }
 }

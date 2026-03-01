@@ -17,8 +17,6 @@
 
   <ItemGroup>
     <Folder Include="DTOs\Location\" />
-    <Folder Include="Mappings\" />
-    <Folder Include="Validators\" />
   </ItemGroup>
 
 </Project>
