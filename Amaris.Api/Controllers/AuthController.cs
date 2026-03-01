@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Amaris.Application.DTOs.Auth;
+﻿using Amaris.Application.DTOs.Auth;
 using Amaris.Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Amaris.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("authenticated")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;

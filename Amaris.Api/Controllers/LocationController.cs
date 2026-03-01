@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Amaris.Domain.Interfaces.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Amaris.Domain.Interfaces.Repositories;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Amaris.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("authenticated")]
 [Authorize]
 public class LocationController : ControllerBase
 {
