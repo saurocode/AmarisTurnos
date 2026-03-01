@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Amaris.Application.DTOs.Turn
+﻿namespace Amaris.Domain.Entities
 {
-    public class TurnFilterDto
+    public class TurnFilter
     {
         public string? Identification { get; set; }
         public string? Status { get; set; }

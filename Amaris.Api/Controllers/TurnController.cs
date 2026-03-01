@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Amaris.Application.Common;
 using Amaris.Application.DTOs.Turn;
 using Amaris.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Amaris.Api.Controllers
 {
@@ -38,5 +39,12 @@ namespace Amaris.Api.Controllers
         [HttpPut("estado")]
         public async Task<IActionResult> ActualizarEstado([FromBody] UpdateTurnDto dto) =>
             Ok(await _turnService.UpdateStatusAsync(dto));
+
+        [HttpGet("filtered")]
+        public async Task<IActionResult> GetFiltered([FromQuery] TurnFilterDto filter)
+        {
+            var data = await _turnService.GetFilteredAsync(filter);
+            return Ok(ApiResponse<IEnumerable<TurnResponseDto>>.Ok(data));
+        }
     }
 }

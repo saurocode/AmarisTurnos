@@ -11,5 +11,6 @@ namespace Amaris.Application.Interfaces
         Task<TurnResponseDto> UpdateStatusAsync(UpdateTurnDto dto);
         Task ProcessExpiredTurnAsync();
         Task<IEnumerable<TurnResponseDto>> GetByIdentificationAsync(string identification);
+        Task<IEnumerable<TurnResponseDto>> GetFilteredAsync(TurnFilterDto filter);
     }
 }

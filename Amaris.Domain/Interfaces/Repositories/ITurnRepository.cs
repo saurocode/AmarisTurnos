@@ -12,5 +12,6 @@ namespace Amaris.Domain.Interfaces.Repositories
         Task<Turn> UpdateAsync(Turn turno);
         Task<IEnumerable<Turn>> GetExpiredTurnAsync();
         Task<IEnumerable<Turn>> GetByIdentificationAsync(string identification);
+        Task<IEnumerable<Turn>> GetFilteredAsync(TurnFilter filter);
     }
 }

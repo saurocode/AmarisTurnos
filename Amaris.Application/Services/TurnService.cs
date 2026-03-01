@@ -141,5 +141,21 @@ namespace Amaris.Application.Services
             return turns.Select(t => MapToDto(t, t.Location?.Name ?? "", t.Service?.Name ?? ""));
         }
 
+        public async Task<IEnumerable<TurnResponseDto>> GetFilteredAsync(TurnFilterDto dto)
+        {
+            var filter = new TurnFilter
+            {
+                Identification = dto.Identification,
+                Status = dto.Status,
+                LocationId = dto.LocationId,
+                ServiceId = dto.ServiceId,
+                DateFrom = dto.DateFrom,
+                DateTo = dto.DateTo
+            };
+
+            var turns = await _turnRepository.GetFilteredAsync(filter);
+            return turns.Select(t => MapToDto(t, t.Location?.Name ?? "", t.Service?.Name ?? ""));
+        }
+
     }
 }
