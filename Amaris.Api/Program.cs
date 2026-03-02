@@ -1,19 +1,34 @@
 using Amaris.Api.Extensions;
 using Amaris.Api.Middleware;
-using Microsoft.EntityFrameworkCore;
+using Amaris.Application.Interfaces;
 using Amaris.Infrastructure.Data;
+using Amaris.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Encoder =
+            System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+    })
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.SuppressModelStateInvalidFilter = true;
+    });
+
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services
     .AddDatabase(builder.Configuration)
     .AddRepositories()
     .AddApplicationServices()
     .AddJwtAuthentication(builder.Configuration)
-    .AddSwaggerWithJwt();
+    .AddSwaggerWithJwt()
+    .AddRateLimiting();
 
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
@@ -27,12 +42,14 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 app.MapControllers();
 
 app.Run();

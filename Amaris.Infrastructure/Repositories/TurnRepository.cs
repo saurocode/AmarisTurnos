@@ -1,4 +1,5 @@
-﻿using Amaris.Domain.Entities;
+﻿using Amaris.Application.DTOs.Turn;
+using Amaris.Domain.Entities;
 using Amaris.Domain.Enums;
 using Amaris.Domain.Interfaces.Repositories;
 using Amaris.Infrastructure.Data;
@@ -36,7 +37,7 @@ namespace Amaris.Infrastructure.Repositories
                 .Where(t => t.Identification == cedula)
                 .OrderByDescending(t => t.DateCreation).ToListAsync();
 
-        public async Task<int> CountTurnosHoyByCedulaAsync(string cedula)
+        public async Task<int> CountTurnTodayByCedulaAsync(string cedula)
         {
             var hoy = DateTime.UtcNow.Date;
             return await _context.Turn
@@ -61,9 +62,49 @@ namespace Amaris.Infrastructure.Repositories
             return Turn;
         }
 
-        public async Task<IEnumerable<Turn>> GetTurnosExpiradosAsync() =>
+        public async Task<IEnumerable<Turn>> GetByIdentificationAsync(string identification) =>
+            await _context.Turn
+                .Include(t => t.Location)
+                .Include(t => t.Service)
+                .Where(t => t.Identification == identification)
+                .OrderByDescending(t => t.DateCreation)
+                .ToListAsync();
+
+        public async Task<IEnumerable<Turn>> GetExpiredTurnAsync() =>
             await _context.Turn
                 .Where(t => t.Status == StatusTurn.Pendiente && t.DateExpiration < DateTime.UtcNow)
                 .ToListAsync();
+
+        public async Task<IEnumerable<Turn>> GetFilteredAsync(TurnFilter filter)
+        {
+            var query = _context.Turn
+                .Include(t => t.Location)
+                .Include(t => t.Service)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filter.Identification))
+                query = query.Where(t => t.Identification.Contains(filter.Identification));
+
+            if (!string.IsNullOrWhiteSpace(filter.Status))
+            {
+                if (Enum.TryParse<StatusTurn>(filter.Status, out var statusEnum))
+                    query = query.Where(t => t.Status == statusEnum);
+            }
+            if (filter.LocationId.HasValue)
+                query = query.Where(t => t.IdLocation == filter.LocationId);
+
+            if (filter.ServiceId.HasValue)
+                query = query.Where(t => t.ServiceId == filter.ServiceId);
+
+            if (filter.DateFrom.HasValue)
+                query = query.Where(t => t.DateCreation >= filter.DateFrom);
+
+            if (filter.DateTo.HasValue)
+                query = query.Where(t => t.DateCreation <= filter.DateTo);
+
+            return await query
+                .OrderByDescending(t => t.DateCreation)
+                .ToListAsync();
+        }
     }
 }

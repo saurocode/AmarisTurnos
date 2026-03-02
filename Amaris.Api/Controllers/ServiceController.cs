@@ -1,11 +1,13 @@
 ﻿using Amaris.Domain.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Amaris.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("authenticated")]
 [Authorize]
 public class ServiceController : ControllerBase
 {

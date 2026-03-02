@@ -4,11 +4,13 @@ namespace Amaris.Application.Interfaces
 {
     public interface ITurnService
     {
-        Task<TurnResponseDto> CrearTurnoAsync(CreateTurnDto dto);
-        Task<IEnumerable<TurnResponseDto>> ObtenerTodosAsync();
-        Task<TurnResponseDto?> ObtenerPorIdAsync(int id);
-        Task<TurnResponseDto> ActivarTurnoAsync(int id);
-        Task<TurnResponseDto> ActualizarEstadoAsync(UpdateTurnDto dto);
-        Task ProcesarTurnosExpiradosAsync();
+        Task<TurnResponseDto> CreateTurnAsync(CreateTurnDto dto);
+        Task<IEnumerable<TurnResponseDto>> GetAllAsync();
+        Task<TurnResponseDto?> GetByIdAsync(int id);
+        Task<TurnResponseDto> ActivateTurnAsync(int id);
+        Task<TurnResponseDto> UpdateStatusAsync(UpdateTurnDto dto);
+        Task ProcessExpiredTurnAsync();
+        Task<IEnumerable<TurnResponseDto>> GetByIdentificationAsync(string identification);
+        Task<IEnumerable<TurnResponseDto>> GetFilteredAsync(TurnFilterDto filter);
     }
 }

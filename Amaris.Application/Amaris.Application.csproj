@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.0.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,8 +18,6 @@
 
   <ItemGroup>
     <Folder Include="DTOs\Location\" />
-    <Folder Include="Mappings\" />
-    <Folder Include="Validators\" />
   </ItemGroup>
 
 </Project>
