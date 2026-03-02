@@ -2,7 +2,7 @@
 using Amaris.Application.Validators;
 using FluentAssertions;
 
-namespace Amaris.Tests.Validators
+namespace UnitTests.Validators
 {
     public class CreateTurnValidatorTests
     {

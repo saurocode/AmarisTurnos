@@ -3,7 +3,7 @@ using Amaris.Application.Validators;
 using FluentAssertions;
 using Xunit;
 
-namespace Amaris.Tests.Validators
+namespace UnitTests.Validators
 {
     public class LoginValidatorTests
     {

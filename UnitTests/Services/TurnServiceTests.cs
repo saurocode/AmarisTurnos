@@ -3,12 +3,12 @@ using Amaris.Application.Services;
 using Amaris.Domain.Entities;
 using Amaris.Domain.Enums;
 using Amaris.Domain.Interfaces.Repositories;
-using Amaris.Tests.Helpers;
+using UnitTests.Helpers;
 using FluentAssertions;
 using Moq;
 using Xunit;
 
-namespace Amaris.Tests.Services
+namespace UnitTests.Services
 {
     public class TurnServiceTests
     {
@@ -49,7 +49,7 @@ namespace Amaris.Tests.Services
 
             result.Should().NotBeNull();
             result.Identification.Should().Be("1234567890");
-            result.Status.Should().Be("Pending");
+            result.Status.Should().Be("Pendiente");
             result.MinutesRemaining.Should().BeGreaterThan(0);
         }
 
@@ -92,17 +92,17 @@ namespace Amaris.Tests.Services
         [Fact]
         public async Task ActivateTurnAsync_PendingTurn_ReturnsActivatedTurn()
         {
-            
+
             var turn = MockHelper.CreateTurn(status: StatusTurn.Pendiente);
             _turnRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(turn);
             _turnRepoMock.Setup(r => r.UpdateAsync(It.IsAny<Turn>()))
                 .ReturnsAsync((Turn t) => t);
 
-            
+
             var result = await _turnService.ActivateTurnAsync(1);
 
-            
-            result.Status.Should().Be("Active");
+
+            result.Status.Should().Be("Activo");
             result.Should().NotBeNull();
         }
 
@@ -111,16 +111,16 @@ namespace Amaris.Tests.Services
         {
 
             var turn = MockHelper.CreateTurn(status: StatusTurn.Pendiente);
-            turn.DateExpiration = DateTime.UtcNow.AddMinutes(-1); 
+            turn.DateExpiration = DateTime.UtcNow.AddMinutes(-1);
 
             _turnRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(turn);
             _turnRepoMock.Setup(r => r.UpdateAsync(It.IsAny<Turn>()))
                 .ReturnsAsync((Turn t) => t);
 
-  
+
             var act = async () => await _turnService.ActivateTurnAsync(1);
 
-    
+
             await act.Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*expiró*");
         }
