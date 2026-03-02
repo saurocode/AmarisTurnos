@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36310.24 d17.14
+VisualStudioVersion = 17.14.36310.24
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amaris.Api", "Amaris.Api\Amaris.Api.csproj", "{6B3E791F-6723-4B7C-A334-0FD33386BD64}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amaris.Application", "Amaris.Application\Amaris.Application.csproj", "{44AC4126-51A2-4B93-8341-B1AA718A0D1E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amaris.Infrastructure", "Amaris.Infrastructure\Amaris.Infrastructure.csproj", "{4F9BCA2A-B162-411B-A994-ACDA96554056}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amaris.Tests", "Amaris.Testss\Amaris.Tests.csproj", "{78A19E5A-62E5-4AEF-A6B4-B80180968DF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{4F9BCA2A-B162-411B-A994-ACDA96554056}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F9BCA2A-B162-411B-A994-ACDA96554056}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F9BCA2A-B162-411B-A994-ACDA96554056}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78A19E5A-62E5-4AEF-A6B4-B80180968DF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78A19E5A-62E5-4AEF-A6B4-B80180968DF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78A19E5A-62E5-4AEF-A6B4-B80180968DF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78A19E5A-62E5-4AEF-A6B4-B80180968DF1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

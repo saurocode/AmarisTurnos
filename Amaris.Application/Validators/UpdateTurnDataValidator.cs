@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Amaris.Application.Validators
 {
-    public class UpdateTurnDataValidator : AbstractValidator<UpdateTurnDataDto>
+    public class UpdateTurnDataValidator : AbstractValidator<UpdateTurnDto>
     {
         public UpdateTurnDataValidator()
         {
