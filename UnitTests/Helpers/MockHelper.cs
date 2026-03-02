@@ -1,7 +1,7 @@
 ﻿using Amaris.Domain.Entities;
 using Amaris.Domain.Enums;
 
-namespace Amaris.Tests.Helpers
+namespace UnitTests.Helpers
 {
     public static class MockHelper
     {
